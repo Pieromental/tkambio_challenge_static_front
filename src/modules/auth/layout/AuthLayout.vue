@@ -21,7 +21,7 @@
 </template>
 
 <style scoped lang="sass">
-@import '@/assets/main.sass'
+@import '@/assets/styles/main.sass'
 
 .layout
   display: flex
