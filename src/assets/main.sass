@@ -1,0 +1,16 @@
+body
+  max-width: 100%
+  margin: 0
+  font-family: 'ArgentumSans-Regular', sans-serif
+  font-weight: 100
+  font-style: normal
+
+$breakpoints: ("sm": 640px, "md": 768px, "lg": 1024px, "xl": 1280px, "2xl": 1536px)
+
+@mixin responsive($size, $direction: "min")
+  @if $direction == "max"
+    @media (max-width: map-get($breakpoints, $size))
+      @content
+  @else
+    @media (min-width: map-get($breakpoints, $size))
+      @content
