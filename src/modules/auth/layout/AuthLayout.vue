@@ -53,4 +53,6 @@
   &__right
     width: 50%
     height: 100%
+    @include responsive("lg", "max")
+      width: 90%
 </style>

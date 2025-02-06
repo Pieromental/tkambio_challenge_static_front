@@ -36,7 +36,7 @@
     margin-bottom: 1rem
     text-align: center
   form
-    min-width: 70%
+    min-width: 80%
   &-group
     display: flex
     flex-direction: column
