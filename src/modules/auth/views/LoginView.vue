@@ -50,19 +50,16 @@
 /****************************************************************************/
 import { ref, reactive, watchEffect, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { resources } from '../api/AuthResource'
-import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
-import { useCrypto } from '@/composable/crypto/useCrypto'
+
 import { useLoader } from '@/composable/loader/useLoader'
 import { useAlert } from '@/composable/alert/useAlert'
 import eyeOpen from '@/assets/icons/eye-close-up.png'
 import eyeClosed from '@/assets/icons/closed-eyes.png'
-
+import mockUsers from '@/mocks/mockUser.json'
 /****************************************************************************/
 /*                             COMPOSABLE                                    */
 /****************************************************************************/
-const { fetchHttpResource } = useFetchHttp()
-const { encryptAES, decryptAES } = useCrypto()
+
 const { showLoader, hideLoader } = useLoader()
 const { showAlert } = useAlert()
 const router = useRouter()
@@ -103,47 +100,43 @@ const login = async () => {
   try {
     validateField('email')
     validateField('password')
+
     if (!form.errors.email && !form.errors.password) {
-      resources.login.data = {
-        email: form.email.trim(),
-        password: form.password.trim(),
-      }
       showLoader()
-      const response: any = await fetchHttpResource(resources.login, true)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const user: { email: string; password: string } | null = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(
+            mockUsers.find(
+              (u) => u.email === form.email.trim() && u.password === form.password.trim(),
+            ) || null,
+          )
+        }, 1000)
+      })
       hideLoader()
-
-      if (response.status) {
-        const data = response.data
-        const tokenString: string = data.token ? String(data.token) : ''
-
+      if (user) {
         if (form.rememberMe) {
-          localStorage.setItem(import.meta.env.VITE_NAME_TOKEN, encryptAES(tokenString) ?? '')
+          localStorage.setItem('mock_token', 'fake_token_12345')
         } else {
-          sessionStorage.setItem(import.meta.env.VITE_NAME_TOKEN, encryptAES(tokenString) ?? '')
+          sessionStorage.setItem('mock_token', 'fake_token_12345')
         }
         router.push({ name: 'main' })
       } else {
         await showAlert({
           type: 'error',
-          title: response.title,
-          message: response.message,
+          title: 'Error de autenticación',
+          message: 'Correo o contraseña incorrectos.',
         })
       }
-      console.log('Formulario enviado con:', { email: form.email, password: form.password })
     }
   } catch (error) {
     console.log(error)
   }
 }
-const verificarLogin = async () => {
-  const encryptedToken =
-    localStorage.getItem(import.meta.env.VITE_NAME_TOKEN) ||
-    sessionStorage.getItem(import.meta.env.VITE_NAME_TOKEN)
-  if (encryptedToken) {
-    const token = decryptAES(encryptedToken)
-    if (token) {
-      router.push({ name: 'main' })
-    }
+const verificarLogin = () => {
+  const token = localStorage.getItem('mock_token') || sessionStorage.getItem('mock_token')
+  if (token) {
+    router.push({ name: 'main' })
   }
 }
 /****************************************************************************/

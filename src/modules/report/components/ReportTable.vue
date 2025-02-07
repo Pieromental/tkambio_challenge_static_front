@@ -38,17 +38,15 @@ import type { Reporte } from '@/modules/report/interfaces/report'
 import { defineProps, ref, watch, type PropType } from 'vue'
 import ReportButton from './ReportButton.vue'
 import downloadIcon from '@/assets/icons/download.png'
-import { resources } from '../api/ReportResource'
+
 import { useLoader } from '@/composable/loader/useLoader'
 import { useAlert } from '@/composable/alert/useAlert'
-import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
 
 /****************************************************************************/
 /*                             COMPOSABLES                                    */
 /****************************************************************************/
 const { showLoader, hideLoader } = useLoader()
 const { showAlert } = useAlert()
-const { fetchHttpResource } = useFetchHttp()
 
 /****************************************************************************/
 /*                             PROPS                                        */
@@ -78,20 +76,23 @@ watch(
 const exportReport = async (report: Reporte) => {
   try {
     showLoader()
-    resources.getReport.download = true
-    resources.getReport.paramsRoute = [report.report_id]
-    resources.getReport.nameDocument = 'Report_' + report.created_at
-    const response: any = await fetchHttpResource(resources.getReport, true)
+
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const filePath = `/reports/Report.xlsx`
+    const link = document.createElement('a')
+    link.href = filePath
+    link.setAttribute('download', `Reporte_${report.created_at}.xlsx`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
     hideLoader()
-    if (!response.status) {
-      await showAlert({
-        type: 'warning',
-        title: response.title,
-        message: response.message,
-      })
-    }
   } catch (error) {
     console.log(error)
+    await showAlert({
+      type: 'error',
+      title: 'Error de descarga',
+      message: 'No se pudo descargar el archivo.',
+    })
   }
 }
 </script>

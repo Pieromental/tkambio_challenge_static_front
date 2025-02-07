@@ -1,0 +1,62 @@
+[
+  {
+    "report_id": "1",
+    "user_id": "12345",
+    "title": "Planificación del Proyecto",
+    "description": "Descripción del reporte de planificación.",
+    "report_link": "/storage/reports/planificacion.xlsx",
+    "active": 1,
+    "created_by": "admin",
+    "updated_by": null,
+    "created_at": "2025-01-01",
+    "updated_at": "2025-01-02"
+  },
+  {
+    "report_id": "2",
+    "user_id": "12345",
+    "title": "Revisión de Requisitos",
+    "description": "Descripción del reporte de requisitos.",
+    "report_link": "/storage/reports/requisitos.xlsx",
+    "active": 1,
+    "created_by": "admin",
+    "updated_by": null,
+    "created_at": "2025-01-05",
+    "updated_at": "2025-01-06"
+  },
+  {
+    "report_id": "3",
+    "user_id": "67890",
+    "title": "Diseño del Sistema",
+    "description": "Reporte sobre el diseño del sistema.",
+    "report_link": "/storage/reports/diseno.xlsx",
+    "active": 1,
+    "created_by": "admin",
+    "updated_by": null,
+    "created_at": "2025-01-10",
+    "updated_at": "2025-01-11"
+  },
+  {
+    "report_id": "4",
+    "user_id": "67890",
+    "title": "Desarrollo de Módulos",
+    "description": "Reporte sobre el desarrollo de módulos.",
+    "report_link": "/storage/reports/desarrollo.xlsx",
+    "active": 1,
+    "created_by": "admin",
+    "updated_by": "moderator",
+    "created_at": "2025-01-15",
+    "updated_at": "2025-01-16"
+  },
+  {
+    "report_id": "5",
+    "user_id": "24680",
+    "title": "Pruebas Iniciales",
+    "description": "Reporte de pruebas iniciales del sistema.",
+    "report_link": "/storage/reports/pruebas.xlsx",
+    "active": 1,
+    "created_by": "admin",
+    "updated_by": null,
+    "created_at": "2025-01-20",
+    "updated_at": "2025-01-21"
+  }
+]

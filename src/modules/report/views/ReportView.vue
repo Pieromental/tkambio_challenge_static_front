@@ -17,23 +17,23 @@
 /****************************************************************************/
 import { onMounted, ref } from 'vue'
 import { useLoader } from '@/composable/loader/useLoader'
-import { useAlert } from '@/composable/alert/useAlert'
-import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
+
 import ReportTable from '../components/ReportTable.vue'
 import ReportModal from '../components/ReportModal.vue'
 import ReportButton from '../components/ReportButton.vue'
-import { resources } from '../api/ReportResource'
+
+import mockDataReport from '@/mocks//mockDataReport.json'
+import type { Reporte } from '../interfaces/report'
 /****************************************************************************/
 /*                             COMPOSABLES                                    */
 /****************************************************************************/
-const { fetchHttpResource } = useFetchHttp()
+
 const { showLoader, hideLoader } = useLoader()
-const { showAlert } = useAlert()
 
 /****************************************************************************/
 /*                             DATA                                       */
 /****************************************************************************/
-const dataReport = ref([])
+const dataReport = ref<Reporte[]>([])
 const showModal = ref(false)
 /****************************************************************************/
 /*                             METHODS                                       */
@@ -42,18 +42,15 @@ const showModal = ref(false)
 const listReport = async () => {
   try {
     showLoader()
-    const response: any = await fetchHttpResource(resources.listReport, true)
-    hideLoader()
-
-    if (response.status) {
-      dataReport.value = response.data
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const storedReports = localStorage.getItem('mock_reports')
+    if (storedReports) {
+      dataReport.value = JSON.parse(storedReports)
     } else {
-      await showAlert({
-        type: 'error',
-        title: response.title,
-        message: response.message,
-      })
+      dataReport.value = mockDataReport
     }
+
+    hideLoader()
   } catch (error) {
     console.log(error)
   }

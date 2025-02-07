@@ -68,17 +68,15 @@
 /****************************************************************************/
 import { ref, watch } from 'vue'
 import ReportButton from './ReportButton.vue'
-import { resources } from '../api/ReportResource'
 import { useLoader } from '@/composable/loader/useLoader'
 import { useAlert } from '@/composable/alert/useAlert'
-import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
-
+import mockDataReport from '@/mocks//mockDataReport.json'
 /****************************************************************************/
 /*                             COMPOSABLES                                    */
 /****************************************************************************/
 const { showLoader, hideLoader } = useLoader()
 const { showAlert } = useAlert()
-const { fetchHttpResource } = useFetchHttp()
+
 /****************************************************************************/
 /*                             DATA                                      */
 /****************************************************************************/
@@ -90,6 +88,7 @@ const isComplete = ref(false)
 const dateError = ref(false)
 const isDescriptionInvalid = ref(false)
 const errorDescription = ref('')
+const dataReport = ref(mockDataReport)
 /****************************************************************************/
 /*                             EMITS                                      */
 /****************************************************************************/
@@ -97,6 +96,10 @@ const emit = defineEmits(['closeModal'])
 /****************************************************************************/
 /*                             METHODS                                      */
 /****************************************************************************/
+const saveMockReports = () => {
+  localStorage.setItem('mock_reports', JSON.stringify(dataReport.value))
+}
+
 const checkCompletion = () => {
   if (description.value.length > 0 && startDate.value && endDate.value) {
     isComplete.value = true
@@ -152,22 +155,54 @@ const closeModal = () => {
 
 const submitForm = async () => {
   try {
-    showLoader()
-    resources.createReport.data = {
-      title: description.value,
-      start_date: startDate.value,
-      end_date: endDate.value,
+    if (!description.value.trim() || !startDate.value || !endDate.value) {
+      await showAlert({
+        type: 'warning',
+        title: 'Campos incompletos',
+        message: 'Todos los campos son obligatorios.',
+      })
+      return
     }
-    const response: any = await fetchHttpResource(resources.createReport, true)
+
+    showLoader()
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const newReport = {
+      report_id: Date.now().toString(),
+      user_id: '12345',
+      title: description.value.trim(),
+      description: 'Descripción del reporte generado.',
+      report_link: `/storage/reports/reporte_${Date.now()}.xlsx`,
+      active: 1,
+      created_by: 'admin',
+      updated_by: null,
+      created_at: new Date().toISOString().split('T')[0],
+      updated_at: new Date().toISOString().split('T')[0],
+    }
+
+    dataReport.value.push(newReport)
+
+    saveMockReports()
+
     hideLoader()
+
     await showAlert({
-      type: response.status ? 'information' : 'error',
-      title: response.title,
-      message: response.message,
+      type: 'success',
+      title: 'Reporte creado',
+      message: 'El reporte se ha generado correctamente.',
     })
+    description.value = ''
+    startDate.value = ''
+    endDate.value = ''
+    isComplete.value = false
     closeModal()
   } catch (error) {
-    console.log(error)
+    hideLoader()
+    console.error('Error al crear reporte:', error)
+    await showAlert({
+      type: 'error',
+      title: 'Error',
+      message: 'Ocurrió un error inesperado. Inténtalo de nuevo.',
+    })
   }
 }
 </script>
