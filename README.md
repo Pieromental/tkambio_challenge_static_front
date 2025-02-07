@@ -1,45 +1,163 @@
-# tkambio_challenge_front
+# TKAMBIO CHALLENGE FRONTEND
 
-This template should help get you started developing with Vue 3 in Vite.
+## 📌 Descripción
 
-## Recommended IDE Setup
+Este es un proyecto frontend desarrollado con **Vue 3, Composition API y SASS**. Implementa una arquitectura modular, soporta autenticación, carga dinámica de componentes y uso de plugins personalizados. Se integra con una API backend para la gestión de reportes.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 🚀 Tecnologías utilizadas
 
-## Type Support for `.vue` Imports in TS
+- Vue 3 + Vite
+- TypeScript
+- Vue Router
+- Pinia (Opcional para gestión de estado)
+- Axios (para peticiones HTTP)
+- SASS (para estilos)
+- Plugins personalizados para **alertas** y **loaders**
+- Soporte para variables de entorno `.env`
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+---
 
-## Customize configuration
+## 📂 Estructura del Proyecto
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+```
+📦 src
+ ├📂 assets
+ ┃ ├📂 icons (Iconos usados en la UI)
+ ┃ ├📂 styles (Estilos globales en SASS)
+ ├📂 components
+ ┃ ├📂 _tests_ (Pruebas unitarias)
+ ┃ ├ AlertComponent.vue
+ ┃ ├ LoaderComponent.vue
+ ├📂 composable
+ ┃ ├📂 alert (Manejo de alertas con plugin)
+ ┃ ├📂 crypto (Manejo de encriptación)
+ ┃ ├📂 fetch (Lógica para peticiones HTTP con Axios)
+ ┃ ├📂 loader (Manejo del loader con plugin)
+ ├📂 modules
+ ┃ ├📂 auth (Módulo de autenticación)
+ ┃ ├📂 report (Módulo de reportes)
+ ├📂 plugin (Plugins personalizados: alertPlugin, loaderPlugin)
+ ├📂 router (Definición de rutas)
+ ├📂 stores (Pinia store, opcional)
+ ├📂 views
+ ┃ ├ HomeView.vue
+ ┃ ├ AboutView.vue
+ ┃ ├ NotFound.vue
+ ┃ ├ LoginView.vue
+ ├ main.ts (Punto de entrada del proyecto)
+ ├ App.vue (Componente raíz)
+ ├ router/index.ts (Configuración de Vue Router)
+ ├ .env (Variables de entorno)
+ ├ tsconfig.json (Configuración de TypeScript)
+ ├ vite.config.ts (Configuración de Vite)
+```
 
-## Project Setup
+---
 
-```sh
+## 🔧 Configuración del entorno
+
+Antes de ejecutar el proyecto, asegúrate de configurar las variables de entorno.
+
+### 🛡️ 1. Crear el archivo `.env` en la raíz del proyecto
+
+Copia y pega las siguientes variables:
+
+```
+BASE_URL=http://localhost/
+NODE_ENV=development
+VITE_NAME_TOKEN=dJ12ksx_wqh821kjs
+VITE_CLIENT_API_URL=http://localhost:8080
+VITE_CLIENT_CRED_ENCRYPT_KEY=HdCQjbkyixu7y9_7wgMHJt6VVzM76izY
+```
+
+> 👐 **Nota:** Si la API backend no está en `http://localhost:8080`, cambia `VITE_CLIENT_API_URL` con la URL correcta.
+
+---
+
+## 💪 Instalación y ejecución
+
+### 🛠️ 1. Instalar dependencias
+
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### 🛠️ 2. Ejecutar en desarrollo
 
-```sh
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+> La aplicación se ejecutará en `http://localhost:5173` (según la configuración de Vite).
 
-```sh
+### 🛠️ 3. Construir para producción
+
+```bash
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### 🛠️ 4. Servir la versión de producción localmente
 
-```sh
-npm run test:unit
+```bash
+npm run preview
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+---
 
-```sh
-npm run lint
+## 🔐 Uso de Plugins Personalizados
+
+### 🟢 **Loader Plugin**
+
+Este plugin gestiona la pantalla de carga.
+
+```ts
+import { useLoader } from '@/composable/loader/useLoader'
+
+const { showLoader, hideLoader } = useLoader()
+
+showLoader() // Muestra el loader
+hideLoader() // Oculta el loader
 ```
+
+---
+
+### ⚠️ **Alert Plugin**
+
+Este plugin maneja las alertas personalizadas.
+
+```ts
+import { useAlert } from '@/composable/alert/useAlert'
+
+const { showAlert } = useAlert()
+
+await showAlert({
+  type: 'success',
+  title: 'Operación exitosa',
+  message: 'Los datos fueron guardados correctamente.',
+})
+```
+
+---
+
+## 📼 Peticiones HTTP con Fetch Composable
+
+Este proyecto usa un **Composable** para manejar peticiones HTTP con Axios.
+
+```ts
+import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
+import { resources } from '../api/ReportResource'
+
+const { fetchHttpResource } = useFetchHttp()
+
+const response = await fetchHttpResource(resources.getReports)
+console.log(response)
+```
+
+Para descargas de archivos:
+
+```ts
+resources.getReport.download = true
+const response = await fetchHttpResource(resources.getReport)
+```
+
+---
