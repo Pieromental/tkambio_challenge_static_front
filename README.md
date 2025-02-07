@@ -4,7 +4,7 @@
 
 Este proyecto es el frontend del sistema TKAMBIO, desarrollado con Vue 3, Composition API y Sass. Está diseñado para interactuar con el backend alojado en el siguiente repositorio:
 
-🔗 Backend del Proyecto: tkambio_back
+🔗 **Backend del Proyecto:** [tkambio_back](https://github.com/Pieromental/tkambio_back.git)
 
 ## 🚀 Tecnologías utilizadas
 
