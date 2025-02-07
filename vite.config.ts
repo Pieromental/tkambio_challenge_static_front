@@ -12,6 +12,7 @@ export default defineConfig({
     vueJsx(),
     vueDevTools(),
   ],
+  base:'/tkambio_challenge_static_front/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
