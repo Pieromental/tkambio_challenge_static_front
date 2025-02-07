@@ -52,24 +52,6 @@ Este proyecto es una versión estática del frontend del sistema TKAMBIO, desarr
  ├ vite.config.ts (Configuración de Vite)
 ```
 
----
-
-## 🔧 Configuración del entorno
-
-Antes de ejecutar el proyecto, asegúrate de configurar las variables de entorno.
-
-### 🛡️ 1. Crear el archivo `.env` en la raíz del proyecto
-
-Copia y pega las siguientes variables:
-
-```
-BASE_URL=http://localhost/
-NODE_ENV=development
-```
-
-> 👐 **Nota:** En esta versión estática, solo se necesita `BASE_URL` y `NODE_ENV`, ya que todo está manejado con mocks.
-
----
 
 ## 💪 Instalación y ejecución
 
