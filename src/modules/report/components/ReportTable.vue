@@ -78,7 +78,7 @@ const exportReport = async (report: Reporte) => {
     showLoader()
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    const filePath = `/reports/Report.xlsx`
+    const filePath = `${import.meta.env.BASE_URL}/reports/Report.xlsx`;
     const link = document.createElement('a')
     link.href = filePath
     link.setAttribute('download', `Reporte_${report.created_at}.xlsx`)
