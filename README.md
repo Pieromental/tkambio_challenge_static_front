@@ -2,7 +2,9 @@
 
 ## 📌 Descripción
 
-Este es un proyecto frontend desarrollado con **Vue 3, Composition API y SASS**. Implementa una arquitectura modular, soporta autenticación, carga dinámica de componentes y uso de plugins personalizados. Se integra con una API backend para la gestión de reportes.
+Este proyecto es el frontend del sistema TKAMBIO, desarrollado con Vue 3, Composition API y Sass. Está diseñado para interactuar con el backend alojado en el siguiente repositorio:
+
+🔗 Backend del Proyecto: tkambio_back
 
 ## 🚀 Tecnologías utilizadas
 
