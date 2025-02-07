@@ -1,17 +1,41 @@
 <template>
   <div class="log-container">
     <h1 class="log-container-title">Inicia Sesión</h1>
-    <form action="">
-      <div class="log-container-group">
+    <form @submit.prevent="login">
+      <div class="log-container-group" :class="{ error: form.errors.email }">
         <label for="email" class="log-container-label"> Correo</label>
-        <input type="text" class="log-container-input" />
+        <input
+          type="text"
+          v-model="form.email"
+          class="log-container-input"
+          @blur="validateField('email')"
+        />
+        <span v-if="form.errors.email" class="log-container-error">{{ form.errors.email }}</span>
       </div>
-      <div class="log-container-group">
+      <div class="log-container-group password-group" :class="{ error: form.errors.password }">
         <label for="password" class="log-container-label">Contraseña</label>
-        <input type="text" class="log-container-input" />
+        <div class="password-container">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="form.password"
+            class="log-container-input"
+            @blur="validateField('password')"
+          />
+          <button type="button" class="eye-button" @click="togglePassword">
+            <img :src="showPassword ? eyeClosed : eyeOpen" alt="Toggle Password" />
+          </button>
+        </div>
+
+        <span v-if="form.errors.password" class="log-container-error">{{
+          form.errors.password
+        }}</span>
       </div>
       <div class="log-container-remenber-me">
-        <input type="checkbox" class="log-container-remenber-me-check-box" />
+        <input
+          type="checkbox"
+          class="log-container-remenber-me-check-box"
+          v-model="form.rememberMe"
+        />
         <label class="log-container-remenber-me-label">Recordar Sesión</label>
       </div>
       <div class="log-container-log-button">
@@ -20,6 +44,99 @@
     </form>
   </div>
 </template>
+<script setup lang="ts">
+/****************************************************************************/
+/*                             IMPORTS                                      */
+/****************************************************************************/
+import { ref, reactive, watchEffect, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { resources } from '../api/AuthResource'
+import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
+import { useCrypto } from '@/composable/crypto/useCrypto'
+import eyeOpen from '@/assets/icons/eye-close-up.png'
+import eyeClosed from '@/assets/icons/closed-eyes.png'
+
+/****************************************************************************/
+/*                             COMPOSABLE                                    */
+/****************************************************************************/
+const { fetchHttpResource } = useFetchHttp()
+const { encryptAES, decryptAES } = useCrypto()
+const router = useRouter()
+/****************************************************************************/
+/*                             DATA                                         */
+/****************************************************************************/
+const form = reactive({
+  email: '',
+  password: '',
+  rememberMe: false,
+  errors: { email: '', password: '' },
+})
+
+const showPassword = ref(false)
+/****************************************************************************/
+/*                             WATCHERS                                      */
+/****************************************************************************/
+watchEffect(() => {
+  if (form.email) form.errors.email = ''
+  if (form.password) form.errors.password = ''
+})
+/****************************************************************************/
+/*                             METHODS                                       */
+/****************************************************************************/
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+const validateField = (field: 'email' | 'password') => {
+  form.errors[field] = !form[field]
+    ? field === 'email'
+      ? 'El correo es obligatorio'
+      : 'La contraseña es obligatoria'
+    : ''
+}
+
+const login = async () => {
+  try {
+    validateField('email')
+    validateField('password')
+    if (!form.errors.email && !form.errors.password) {
+      resources.login.data = {
+        ...form,
+      }
+      const response: any = await fetchHttpResource(resources.login, true)
+      if (response.status) {
+        const data = response.data
+        const tokenString: string = data.token ? String(data.token) : ''
+
+        if (form.rememberMe) {
+          localStorage.setItem(import.meta.env.VITE_NAME_TOKEN, encryptAES(tokenString) ?? '')
+        } else {
+          sessionStorage.setItem(import.meta.env.VITE_NAME_TOKEN, encryptAES(tokenString) ?? '')
+        }
+      }
+      console.log('Formulario enviado con:', { email: form.email, password: form.password })
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+const verificarLogin = async () => {
+  const encryptedToken =
+    localStorage.getItem(import.meta.env.VITE_NAME_TOKEN) ||
+    sessionStorage.getItem(import.meta.env.VITE_NAME_TOKEN)
+  if (encryptedToken) {
+    const token = decryptAES(encryptedToken)
+    if (token) {
+      router.push('/dashboard')
+    }
+  }
+}
+/****************************************************************************/
+/*                             LYFECICLE                                     */
+/****************************************************************************/
+onMounted(() => {
+  verificarLogin()
+})
+</script>
 
 <style lang="sass">
 .log-container
@@ -40,8 +157,19 @@
   &-group
     display: flex
     flex-direction: column
-    margin-bottom: 1rem
+    margin-bottom: 2rem
+    position: relative
 
+    &.error
+      .log-container-input
+        border-color: #e3342f !important
+        background-color: #fff5f5
+
+      .log-container-error
+        color: #e3342f
+        font-size: 0.85rem
+        position: absolute
+        bottom: -20px
   &-label
     color: #4b5563
     margin-bottom: 0.5rem
@@ -55,8 +183,6 @@
     outline: none
     &:focus
       border-color: #3b82f6
-
-
   &-remenber-me
     margin-top: 1.5rem
     margin-bottom: 1.5rem
@@ -84,4 +210,24 @@
       transition: background 0.3s ease
       &:hover
         background-color: darken(#FFAE0E, 10%)
+
+.password-container
+  position: relative
+  display: flex
+  align-items: center
+
+.eye-button
+  position: absolute
+  right: 5px
+  background: none
+  border: none
+  cursor: pointer
+  padding: 0
+  img
+    width: 25px
+    height: 25px
+    opacity: 0.7
+    transition: opacity 0.3s eas
+    &:hover
+      opacity: 1
 </style>

@@ -68,23 +68,22 @@ export function useFetchHttp() {
     if (response) {
       if (response.status == 401) {
         localStorage.clear()
-        router.push({ path: '/login' })
+        router.push({ path: '/auth/login' })
       } else {
         return Promise.reject(error)
       }
     } else {
       localStorage.clear()
-      router.push({ path: '/login' })
+      router.push({ path: '/auth/login' })
     }
   }
 
-  const fetchHttpResource = async (
-    options: IHttpResourceOption,
-    loading = true,
-  ): Promise<IHttpResponse> => {
-    const token: string | null = options.token
-      ? options.token
-      : decryptAES(localStorage.getItem(options.nameToken ?? import.meta.env.VITE_NAME_TOKEN) ?? '')
+  const fetchHttpResource = async (options: IHttpResourceOption, loading = true): Promise<any> => {
+    const storedToken =
+      sessionStorage.getItem(import.meta.env.VITE_NAME_TOKEN) ||
+      localStorage.getItem(import.meta.env.VITE_NAME_TOKEN)
+
+    const token: string | null = options.token ? options.token : decryptAES(storedToken ?? '')
 
     const authorization: { authorization?: string } = {}
     if (token !== null && token !== '') {
@@ -133,7 +132,7 @@ export function useFetchHttp() {
         body = response?.data as IHttpResponse
         if (body.code === 401) {
           localStorage.clear()
-          router.push({ path: '/login' })
+          router.push({ path: '/auth/login' })
         }
       }
     } catch (err) {
