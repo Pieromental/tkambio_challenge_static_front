@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { authRoutes } from '@/modules/auth/routes/index'
 import { reportRoutes } from '@/modules/report/routes'
 const router = createRouter({
-  history: createWebHistory('/tkambio_challenge_static_front/'),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
