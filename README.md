@@ -1,4 +1,4 @@
-# TKAMBIO CHALLENGE STATIC FRONTEND
+# TKAMBIO CHALLENGE FRONTEND
 
 ## 📌 Descripción
 
@@ -154,6 +154,23 @@ import mockUsers from '@/mocks/mockUsers.json'
 const user = mockUsers.find(u => u.email === form.email && u.password === form.password)
 ```
 
+### 🔑 Credenciales de prueba
+
+Para acceder a la aplicación, usa las siguientes credenciales:
+
+```
+[
+    {
+        "email": "admin@example.com",
+        "password": "admin123"
+    },
+    {
+        "email": "user@example.com",
+        "password": "user123"
+    }
+]
+```
+
 Para descargas de archivos:
 
 ```ts
@@ -167,6 +184,4 @@ const exportReport = (report) => {
   document.body.removeChild(link)
 }
 ```
-
----
 
