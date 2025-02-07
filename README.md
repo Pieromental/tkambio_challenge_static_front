@@ -1,10 +1,8 @@
-# TKAMBIO CHALLENGE FRONTEND
+# TKAMBIO CHALLENGE STATIC FRONTEND
 
 ## 📌 Descripción
 
-Este proyecto es el frontend del sistema TKAMBIO, desarrollado con Vue 3, Composition API y Sass. Está diseñado para interactuar con el backend alojado en el siguiente repositorio:
-
-🔗 **Backend del Proyecto:** [tkambio_back](https://github.com/Pieromental/tkambio_back.git)
+Este proyecto es una versión estática del frontend del sistema TKAMBIO, desarrollado con Vue 3, Composition API y Sass. En esta versión, todas las peticiones y datos son manejados a través de **mocks**, sin necesidad de un backend real.
 
 ## 🚀 Tecnologías utilizadas
 
@@ -12,10 +10,10 @@ Este proyecto es el frontend del sistema TKAMBIO, desarrollado con Vue 3, Compos
 - TypeScript
 - Vue Router
 - Pinia (Opcional para gestión de estado)
-- Axios (para peticiones HTTP)
+- Axios (para simulación de peticiones HTTP)
 - SASS (para estilos)
 - Plugins personalizados para **alertas** y **loaders**
-- Soporte para variables de entorno `.env`
+- Simulación de autenticación y reportes con **mocks**
 
 ---
 
@@ -27,7 +25,6 @@ Este proyecto es el frontend del sistema TKAMBIO, desarrollado con Vue 3, Compos
  ┃ ├📂 icons (Iconos usados en la UI)
  ┃ ├📂 styles (Estilos globales en SASS)
  ├📂 components
- ┃ ├📂 _tests_ (Pruebas unitarias)
  ┃ ├ AlertComponent.vue
  ┃ ├ LoaderComponent.vue
  ├📂 composable
@@ -35,15 +32,16 @@ Este proyecto es el frontend del sistema TKAMBIO, desarrollado con Vue 3, Compos
  ┃ ├📂 crypto (Manejo de encriptación)
  ┃ ├📂 fetch (Lógica para peticiones HTTP con Axios)
  ┃ ├📂 loader (Manejo del loader con plugin)
+ ├📂 mocks (Datos estáticos para autenticación y reportes)
  ├📂 modules
- ┃ ├📂 auth (Módulo de autenticación)
- ┃ ├📂 report (Módulo de reportes)
+ ┃ ├📂 auth (Módulo de autenticación con mocks)
+ ┃ ├📂 report (Módulo de reportes con mocks)
  ├📂 plugin (Plugins personalizados: alertPlugin, loaderPlugin)
  ├📂 router (Definición de rutas)
  ├📂 stores (Pinia store, opcional)
  ├📂 views
  ┃ ├ HomeView.vue
- ┃ ├ AboutView.vue
+ ┃ ├ ReportView.vue
  ┃ ├ NotFound.vue
  ┃ ├ LoginView.vue
  ├ main.ts (Punto de entrada del proyecto)
@@ -67,12 +65,9 @@ Copia y pega las siguientes variables:
 ```
 BASE_URL=http://localhost/
 NODE_ENV=development
-VITE_NAME_TOKEN=dJ12ksx_wqh821kjs
-VITE_CLIENT_API_URL=http://localhost:8080
-VITE_CLIENT_CRED_ENCRYPT_KEY=HdCQjbkyixu7y9_7wgMHJt6VVzM76izY
 ```
 
-> 👐 **Nota:** Si la API backend no está en `http://localhost:8080`, cambia `VITE_CLIENT_API_URL` con la URL correcta.
+> 👐 **Nota:** En esta versión estática, solo se necesita `BASE_URL` y `NODE_ENV`, ya que todo está manejado con mocks.
 
 ---
 
@@ -141,25 +136,37 @@ await showAlert({
 
 ---
 
-## 📼 Peticiones HTTP con Fetch Composable
+## 📼 Uso de Mocks
 
-Este proyecto usa un **Composable** para manejar peticiones HTTP con Axios.
+En esta versión estática, todas las peticiones se manejan mediante mocks.
 
 ```ts
-import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
-import { resources } from '../api/ReportResource'
+import mockDataReport from '@/mocks/mockDataReport.json'
 
-const { fetchHttpResource } = useFetchHttp()
+const reports = ref(mockDataReport)
+```
 
-const response = await fetchHttpResource(resources.getReports)
-console.log(response)
+Para autenticación, se usa un mock de usuarios:
+
+```ts
+import mockUsers from '@/mocks/mockUsers.json'
+
+const user = mockUsers.find(u => u.email === form.email && u.password === form.password)
 ```
 
 Para descargas de archivos:
 
 ```ts
-resources.getReport.download = true
-const response = await fetchHttpResource(resources.getReport)
+const exportReport = (report) => {
+  const filePath = `/reports/${report.report_id}.xlsx`
+  const link = document.createElement('a')
+  link.href = filePath
+  link.setAttribute('download', `Reporte_${report.report_id}.xlsx`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 ```
 
 ---
+
