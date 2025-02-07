@@ -54,6 +54,7 @@ import { resources } from '../api/AuthResource'
 import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
 import { useCrypto } from '@/composable/crypto/useCrypto'
 import { useLoader } from '@/composable/loader/useLoader'
+import { useAlert } from '@/composable/alert/useAlert'
 import eyeOpen from '@/assets/icons/eye-close-up.png'
 import eyeClosed from '@/assets/icons/closed-eyes.png'
 
@@ -63,6 +64,7 @@ import eyeClosed from '@/assets/icons/closed-eyes.png'
 const { fetchHttpResource } = useFetchHttp()
 const { encryptAES, decryptAES } = useCrypto()
 const { showLoader, hideLoader } = useLoader()
+const { showAlert } = useAlert()
 const router = useRouter()
 
 /****************************************************************************/
@@ -103,10 +105,13 @@ const login = async () => {
     validateField('password')
     if (!form.errors.email && !form.errors.password) {
       resources.login.data = {
-        ...form,
+        email: form.email.trim(),
+        password: form.password.trim(),
       }
       showLoader()
       const response: any = await fetchHttpResource(resources.login, true)
+      hideLoader()
+
       if (response.status) {
         const data = response.data
         const tokenString: string = data.token ? String(data.token) : ''
@@ -116,13 +121,17 @@ const login = async () => {
         } else {
           sessionStorage.setItem(import.meta.env.VITE_NAME_TOKEN, encryptAES(tokenString) ?? '')
         }
+      } else {
+        await showAlert({
+          type: 'error',
+          title: response.title,
+          message: response.message,
+        })
       }
       console.log('Formulario enviado con:', { email: form.email, password: form.password })
     }
   } catch (error) {
     console.log(error)
-  } finally {
-    hideLoader()
   }
 }
 const verificarLogin = async () => {
