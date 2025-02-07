@@ -1,7 +1,7 @@
 <template>
   <button :class="style" :disabled="btnDisable" @click="actionModal">
     {{ title }}
-    <i v-if="icon" :class="icon"></i>
+    <img v-if="icon" :src="icon" alt="Icono" class="button-icon" />
   </button>
 </template>
 
@@ -69,4 +69,9 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+.button-icon
+  width: 20px
+  height: 20px
+  margin-left: 8px
+</style>

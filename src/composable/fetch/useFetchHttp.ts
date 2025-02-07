@@ -106,7 +106,7 @@ export function useFetchHttp() {
     const timeout: number = options.timeout ?? 0
     const auth: Record<string, any> | null = options.auth ?? null
     const download: boolean = options.download ?? false
-    const responseType: string = (options.responseType ?? download) ? 'blob' : 'json'
+    const responseType: string = options.download ? 'blob' : 'json'
     let body: IHttpResponse
 
     if (loading) showLoad()
@@ -126,7 +126,7 @@ export function useFetchHttp() {
       })
 
       if (download) {
-        body = await downloadResource(response, response?.headers['file-name'])
+        body = await downloadResource(response, options.nameDocument || '')
         if (loading) hideLoad()
       } else {
         body = response?.data as IHttpResponse
@@ -155,6 +155,31 @@ export function useFetchHttp() {
     console.log('Loading finished.')
   }
 
+  const getFileExtension = (contentType: string): string => {
+    switch (contentType.toLowerCase()) {
+      case 'application/vnd.ms-excel':
+        return 'xls'
+      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        return 'xlsx'
+      case 'application/pdf':
+        return 'pdf'
+      case 'text/csv':
+        return 'csv'
+      case 'application/msword':
+        return 'doc'
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return 'docx'
+      case 'application/zip':
+        return 'zip'
+      case 'image/jpeg':
+        return 'jpg'
+      case 'image/png':
+        return 'png'
+      default:
+        return 'txt'
+    }
+  }
+
   const downloadResource = async (
     response: AxiosResponse | null,
     name: string,
@@ -170,6 +195,18 @@ export function useFetchHttp() {
         otherData: [],
       } as IHttpResponse
 
+    const getFileNameFromHeader = (headers: any): string | null => {
+      const contentDisposition = headers['content-disposition']
+
+      if (!contentDisposition) return null
+
+      const filenameMatch = contentDisposition.match(/filename=([^;]+)/)
+      if (filenameMatch && filenameMatch[1]) {
+        return filenameMatch[1].replace(/["']/g, '')
+      }
+      return null
+    }
+
     if (response?.headers['content-type'] === 'application/json') {
       const blob: Blob = new Blob([response?.data])
       const text: string = await blob.text()
@@ -181,14 +218,26 @@ export function useFetchHttp() {
       }
     }
 
-    const url = window.URL.createObjectURL(new Blob([response?.data]))
+    const contentType = response?.headers['content-type'] || ''
+    const blob = new Blob([response?.data], { type: contentType })
+    const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', name)
+
+    const headerFileName = getFileNameFromHeader(response?.headers)
+    const fileName = name || headerFileName || 'download'
+
+    // Solo agregar extensión si el nombre no la tiene ya
+    const extension = getFileExtension(contentType)
+    const fullFileName = fileName.includes('.') ? fileName : `${fileName}.${extension}`
+
+    link.setAttribute('download', fullFileName)
     link.click()
+
+    window.URL.revokeObjectURL(url)
     link.remove()
 
-    console.log('¡Descarga completa!') // Reemplazar con notificación personalizada
+    console.log('¡Descarga completa!')
 
     return {
       responseCode: 'IKSUC',

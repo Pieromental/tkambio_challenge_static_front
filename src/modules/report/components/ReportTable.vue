@@ -20,7 +20,8 @@
               <ReportButton
                 :prop-class="'report-button-table'"
                 :prop-title="'Descargar'"
-                :prop-icon="'fa-solid fa-file-arrow-down'"
+                :propIcon="downloadIcon"
+                @click="exportReport(report)"
               />
             </div>
           </td>
@@ -30,25 +31,69 @@
   </div>
 </template>
 <script setup lang="ts">
+/****************************************************************************/
+/*                             IMPORTS                                      */
+/****************************************************************************/
 import type { Reporte } from '@/modules/report/interfaces/report'
 import { defineProps, ref, watch, type PropType } from 'vue'
 import ReportButton from './ReportButton.vue'
+import downloadIcon from '@/assets/icons/download.png'
+import { resources } from '../api/ReportResource'
+import { useLoader } from '@/composable/loader/useLoader'
+import { useAlert } from '@/composable/alert/useAlert'
+import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
 
+/****************************************************************************/
+/*                             COMPOSABLES                                    */
+/****************************************************************************/
+const { showLoader, hideLoader } = useLoader()
+const { showAlert } = useAlert()
+const { fetchHttpResource } = useFetchHttp()
+
+/****************************************************************************/
+/*                             PROPS                                        */
+/****************************************************************************/
 const defProps = defineProps({
   propReporte: {
     type: Array as PropType<Reporte[]>,
     default: () => [],
   },
 })
-
+/****************************************************************************/
+/*                             DATA                                         */
+/****************************************************************************/
 const reports = ref(defProps.propReporte)
-
+/****************************************************************************/
+/*                             WATCHER                                    */
+/****************************************************************************/
 watch(
   () => defProps.propReporte,
   (newValue) => {
     reports.value = newValue
   },
 )
+/****************************************************************************/
+/*                             METHODS                                    */
+/****************************************************************************/
+const exportReport = async (report: Reporte) => {
+  try {
+    showLoader()
+    resources.getReport.download = true
+    resources.getReport.paramsRoute = [report.report_id]
+    resources.getReport.nameDocument = 'Report_' + report.created_at
+    const response: any = await fetchHttpResource(resources.getReport, true)
+    hideLoader()
+    if (!response.status) {
+      await showAlert({
+        type: 'warning',
+        title: response.title,
+        message: response.message,
+      })
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
 </script>
 
 <style scoped lang="sass">
