@@ -53,6 +53,7 @@ import { useRouter } from 'vue-router'
 import { resources } from '../api/AuthResource'
 import { useFetchHttp } from '@/composable/fetch/useFetchHttp'
 import { useCrypto } from '@/composable/crypto/useCrypto'
+import { useLoader } from '@/composable/loader/useLoader'
 import eyeOpen from '@/assets/icons/eye-close-up.png'
 import eyeClosed from '@/assets/icons/closed-eyes.png'
 
@@ -61,7 +62,9 @@ import eyeClosed from '@/assets/icons/closed-eyes.png'
 /****************************************************************************/
 const { fetchHttpResource } = useFetchHttp()
 const { encryptAES, decryptAES } = useCrypto()
+const { showLoader, hideLoader } = useLoader()
 const router = useRouter()
+
 /****************************************************************************/
 /*                             DATA                                         */
 /****************************************************************************/
@@ -102,6 +105,7 @@ const login = async () => {
       resources.login.data = {
         ...form,
       }
+      showLoader()
       const response: any = await fetchHttpResource(resources.login, true)
       if (response.status) {
         const data = response.data
@@ -117,6 +121,8 @@ const login = async () => {
     }
   } catch (error) {
     console.log(error)
+  } finally {
+    hideLoader()
   }
 }
 const verificarLogin = async () => {
