@@ -121,6 +121,7 @@ const login = async () => {
         } else {
           sessionStorage.setItem(import.meta.env.VITE_NAME_TOKEN, encryptAES(tokenString) ?? '')
         }
+        router.push({ name: 'main' })
       } else {
         await showAlert({
           type: 'error',
@@ -141,7 +142,7 @@ const verificarLogin = async () => {
   if (encryptedToken) {
     const token = decryptAES(encryptedToken)
     if (token) {
-      router.push('/dashboard')
+      router.push({ name: 'main' })
     }
   }
 }
